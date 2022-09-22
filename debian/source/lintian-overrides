@@ -1,0 +1,6 @@
+# License is in Reference field (see bug#786450)
+missing-license-paragraph-in-dep5-copyright debian/copyright gpl-3\+ *
+missing-license-text-in-dep5-copyright debian/copyright GPL-3\+ *
+
+# false positive: long regexes are computed but manually applied upstream
+source-is-missing tools/generate-test-fixture.js

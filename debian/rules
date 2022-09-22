@@ -1,0 +1,28 @@
+#!/usr/bin/make -f
+
+ESLINT = eslint
+MOCHA = mocha --no-timeout
+# normalize output with TAP where possible unless terse requested
+ifeq (,$(filter terse,$(DEB_BUILD_OPTIONS)))
+ESLINT += --format tap
+MOCHA += --reporter tap
+else
+ESLINT += --format unix
+MOCHA += --reporter dot --no-colors
+endif
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	[ -e tools/generate-test-fixture.js.orig ] || cp tools/generate-test-fixture.js tools/generate-test-fixture.js.orig
+	perl debian/update-unicode-patterns.pl
+
+# TODO: check full testsuite
+# TODO: lint-check code strictly
+override_dh_auto_test:
+	$(MOCHA) --exclude tests/lib/libraries.js 'tests/lib/**/*.js'
+	$(ESLINT) Makefile.js .eslintrc.js 'lib/**/*.js' espree.js 'tests/lib/**/*.js' || true
+
+override_dh_auto_clean:
+	[ ! -e tools/generate-test-fixture.js.orig ] || mv -f tools/generate-test-fixture.js.orig tools/generate-test-fixture.js

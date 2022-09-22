@@ -1,0 +1,118 @@
+node-espree (7.3.1~dfsg1-3) unstable; urgency=medium
+
+  * simplify source helper script copyright-check
+  * update copyright info:
+    + use Reference field (not License-Reference);
+      tighten lintian overrides
+    + update coverage
+  * add patch cherry-picked upstream
+    to modernize use of NodeJS module acorn,
+    replacing simpler patch applied in 7.3.1~dfsg1-2;
+    fix tighten build-dependency on node-acorn
+  * add file debian/patches/README to source,
+    documenting patch naming micro-policy
+  * add patch 1001 to modernize use of NodeJS module unicode
+  * add source helper script update-unicode-patterns.pl,
+    and refresh unicode patterns during build;
+    build-depend on libipc-system-simple-perl
+    libpath-tiny-perl node-unicode-14.0.0 perl
+  * add autopkgtest; closes: bug#998727, thanks to Yadd
+
+ -- Jonas Smedegaard <dr@jones.dk>  Sun, 07 Nov 2021 15:42:14 +0100
+
+node-espree (7.3.1~dfsg1-2) unstable; urgency=medium
+
+  * Team upload
+  * Update standards version to 4.6.0, no changes needed.
+  * Fix test for acorn ≥ 8 (Closes: #997789)
+
+ -- Yadd <yadd@debian.org>  Sun, 07 Nov 2021 10:08:07 +0100
+
+node-espree (7.3.1~dfsg1-1) unstable; urgency=medium
+
+  [ upstream ]
+  * new release(s)
+
+  [ Jonas Smedegaard ]
+  * stop repackage upstream source
+  * copyright: update coverage
+  * check testsuite and lint-check code;
+    build-depend on
+    eslint mocha node-chai
+    node-eslint-config-eslint node-eslint-plugin-node
+    node-leche node-shelljs
+
+ -- Jonas Smedegaard <dr@jones.dk>  Mon, 14 Dec 2020 03:48:07 +0100
+
+node-espree (6.0.0+ds-4) unstable; urgency=medium
+
+  * add myself as uploader
+  * declare compliance with Debian Policy 4.5.1
+  * add source script copyright-check
+  * copyright:
+    + update coverage
+  * override lintian License-Reference field warnings
+    (see bug#786450)
+  * use debhelper compatibility level 13 (not 12)
+  * update git-buildpackage settings:
+    + sign tags
+    + simplify filter
+    + use DEP-14 git branch names
+    + add usage comment
+  * update watch file:
+    + use file format 4
+    + use substitution strings
+    + simplify regular expressions
+    + use dversionmangle=auto
+    + stop repack
+    + add usage comment
+  * build-depend on dh-sequence-nodejs
+    (not pkg-js-tools)
+  * stop depend on nodejs
+  * simplify versioning of (build-)dependencies
+    (with no functional change)
+
+ -- Jonas Smedegaard <dr@jones.dk>  Mon, 14 Dec 2020 02:38:30 +0100
+
+node-espree (6.0.0+ds-3) unstable; urgency=medium
+
+  * Team upload
+  * Declare compliance with policy 4.5.0
+  * Remove bad dependency to node-acorn-jsx
+  * Update lintian overrides
+
+ -- Xavier Guimard <yadd@debian.org>  Tue, 17 Mar 2020 12:24:06 +0100
+
+node-espree (6.0.0+ds-2) unstable; urgency=medium
+
+  * Team upload
+  * Upload to unstable
+
+ -- Bastien Roucariès <rouca@debian.org>  Fri, 21 Feb 2020 23:14:45 +0100
+
+node-espree (6.0.0+ds-1) experimental; urgency=medium
+
+  [ Xavier Guimard ]
+  * Team upload
+  * Bump debhelper compatibility level to 12
+  * Declare compliance with policy 4.4.1
+  * Add "Rules-Requires-Root: no"
+  * Change section to javascript
+  * Add debian/gbp.conf
+  * Add upstream/metadata
+  * Use pkg-js-tools auto install
+  * Update copyright
+  * Update VCS fields to salsa
+
+  [ Bastien Roucariès ]
+  * Team upload
+  * Upload to experimental for breaking acorn cycle
+  * New upstream version (last that support acorn << 7~)
+
+ -- Bastien Roucariès <rouca@debian.org>  Thu, 20 Feb 2020 12:00:07 +0100
+
+node-espree (3.5.1+ds-1) unstable; urgency=low
+
+  * Initial release (Closes: #876076)
+
+ -- Pirate Praveen <praveen@debian.org>  Mon, 18 Sep 2017 15:31:03 +0530

@@ -1,0 +1,2 @@
+  * check full testsuite during build (don't skip libraries test)
+  * lint-check code strictly

@@ -1,0 +1,55 @@
+Description: modernize use of NodeJS module unicode
+Author: Jonas Smedegaard <dr@jones.dk>
+Last-Update: 2021-11-07
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/package.json
++++ b/package.json
+@@ -38,7 +38,7 @@
+     "regenerate": "^1.4.0",
+     "shelljs": "^0.3.0",
+     "shelljs-nodecli": "^0.1.1",
+-    "unicode-6.3.0": "^0.7.5"
++    "@unicode/unicode-14.0.0": "^1.2.0"
+   },
+   "keywords": [
+     "ast",
+--- a/tools/generate-identifier-regex.js
++++ b/tools/generate-identifier-regex.js
+@@ -3,24 +3,24 @@
+ var regenerate = require('regenerate');
+ 
+ // Which Unicode version should be used?
+-var version = '6.3.0'; // note: also update `package.json` when this changes
++var version = '14.0.0'; // note: also update `package.json` when this changes
+ 
+ // Shorthand function
+ var get = function(what) {
+-    return require('unicode-' + version + '/' + what + '/code-points');
++    return require('@unicode/unicode-' + version + '/' + what + '/code-points');
+ };
+ 
+ // Unicode categories needed to construct the ES5 regex
+-var Lu = get('categories/Lu');
+-var Ll = get('categories/Ll');
+-var Lt = get('categories/Lt');
+-var Lm = get('categories/Lm');
+-var Lo = get('categories/Lo');
+-var Nl = get('categories/Nl');
+-var Mn = get('categories/Mn');
+-var Mc = get('categories/Mc');
+-var Nd = get('categories/Nd');
+-var Pc = get('categories/Pc');
++var Lu = get('General_Category/Uppercase_Letter');
++var Ll = get('General_Category/Lowercase_Letter');
++var Lt = get('General_Category/Titlecase_Letter');
++var Lm = get('General_Category/Modifier_Letter');
++var Lo = get('General_Category/Other_Letter');
++var Nl = get('General_Category/Letter_Number');
++var Mn = get('General_Category/Nonspacing_Mark');
++var Mc = get('General_Category/Spacing_Mark');
++var Nd = get('General_Category/Decimal_Number');
++var Pc = get('General_Category/Connector_Punctuation');
+ 
+ var generateES5Regex = function() { // ES 5.1
+     // http://mathiasbynens.be/notes/javascript-identifiers#valid-identifier-names
