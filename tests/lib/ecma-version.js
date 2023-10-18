@@ -3,34 +3,42 @@
  * @author Nicholas C. Zakas
  */
 
-"use strict";
-
 //------------------------------------------------------------------------------
 // Requirements
 //------------------------------------------------------------------------------
 
-const leche = require("leche"),
-    path = require("path"),
-    shelljs = require("shelljs"),
-    tester = require("./tester"),
-    espree = require("../../espree"),
-    assert = require("assert");
+import fs from "fs";
+import path from "path";
+import shelljs from "shelljs";
+import tester from "./tester.js";
+import * as espree from "../../espree.js";
+import assert from "assert";
+import { fileURLToPath, pathToFileURL } from "url";
+
+
+// eslint-disable-next-line no-underscore-dangle
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+
+const allPiecesJson = JSON.parse(fs.readFileSync(`${__dirname}/../fixtures/parse/all-pieces.json`, "utf8"));
 
 // var espree = require("esprima-fb");
 //------------------------------------------------------------------------------
 // Setup
 //------------------------------------------------------------------------------
 
-const FIXTURES_DIR = "./tests/fixtures/ecma-version/";
+const FIXTURES_DIR = path.resolve(__dirname, "..", "fixtures/ecma-version");
+
 
 const allTestFiles = shelljs.find(FIXTURES_DIR)
-    .filter(filename => filename.indexOf(".src.js") > -1)
-    .map(filename => filename.slice(FIXTURES_DIR.length - 2, filename.length - 7)); // strip off ".src.js"
+    .filter(filename => filename.includes(".src.js"))
+    .map(filename => filename.slice(FIXTURES_DIR.length, filename.length - 7)); // strip off ".src.js"
 
 
-const scriptOnlyTestFiles = allTestFiles.filter(filename => filename.indexOf("modules") === -1);
+const scriptOnlyTestFiles = allTestFiles.filter(filename => !filename.includes("modules"));
 
-const moduleTestFiles = allTestFiles.filter(filename => filename.indexOf("not-strict") === -1 && filename.indexOf("edge-cases") === -1);
+
+const moduleTestFiles = allTestFiles.filter(filename => !filename.includes("not-strict") && !filename.includes("edge-cases"));
 
 //------------------------------------------------------------------------------
 // Tests
@@ -50,55 +58,74 @@ describe("ecmaVersion", () => {
     });
 
     describe("Scripts", () => {
+        scriptOnlyTestFiles.forEach(filename => {
+            describe(filename, () => {
+                const version = filename.slice(1, filename.indexOf("/", 1));
 
-        leche.withData(scriptOnlyTestFiles, filename => {
+                // Uncomment and fill in filename to focus on a single file
+                // var filename = "newTarget/simple-new-target";
+                const code = shelljs.cat(`${FIXTURES_DIR}/${filename}.src.js`);
 
-            const version = filename.slice(0, filename.indexOf("/"));
+                it("should parse correctly when sourceType is script", async () => {
+                    config.ecmaVersion = Number(version);
+                    if (filename.includes("comment")) {
+                        config.comment = true;
+                    }
 
-            // Uncomment and fill in filename to focus on a single file
-            // var filename = "newTarget/simple-new-target";
-            const code = shelljs.cat(`${path.resolve(FIXTURES_DIR, filename)}.src.js`);
+                    const absolutePath = path.resolve(__dirname, FIXTURES_DIR, filename.slice(1));
+                    // eslint-disable-next-line node/no-unsupported-features/es-syntax
+                    const expected = await import(`${pathToFileURL(absolutePath).href}.result.js`);
 
-            it("should parse correctly when sourceType is script", () => {
-                config.ecmaVersion = Number(version);
-                const expected = require(`${path.resolve(__dirname, "../../", FIXTURES_DIR, filename)}.result.js`);
-
-                tester.assertMatches(code, config, expected);
+                    tester.assertMatches(code, config, expected.default);
+                });
             });
 
         });
 
     });
+
 
     describe("Modules", () => {
+        moduleTestFiles.forEach(filename => {
+            describe(filename, () => {
+                const version = filename.slice(1, filename.indexOf("/", 1));
+                const code = shelljs.cat(`${FIXTURES_DIR}/${filename}.src.js`);
 
-        leche.withData(moduleTestFiles, filename => {
+                it("should parse correctly when sourceType is module", async () => {
+                    const absolutePath = path.resolve(__dirname, FIXTURES_DIR, filename.slice(1));
 
-            const version = filename.slice(0, filename.indexOf("/"));
-            const code = shelljs.cat(`${path.resolve(FIXTURES_DIR, filename)}.src.js`);
+                    let expected;
 
-            it("should parse correctly when sourceType is module", () => {
-                let expected;
+                    try {
+                        // eslint-disable-next-line node/no-unsupported-features/es-syntax
+                        expected = await import(`${pathToFileURL(absolutePath).href}.module-result.js`);
+                    } catch {
+                        // eslint-disable-next-line node/no-unsupported-features/es-syntax
+                        expected = await import(`${pathToFileURL(absolutePath).href}.result.js`);
+                    }
 
-                try {
-                    expected = require(`${path.resolve(__dirname, "../../", FIXTURES_DIR, filename)}.module-result.js`);
-                } catch (err) {
-                    expected = require(`${path.resolve(__dirname, "../../", FIXTURES_DIR, filename)}.result.js`);
-                }
+                    if (expected) {
+                        expected = expected.default;
+                    }
 
-                config.ecmaVersion = Number(version);
-                config.sourceType = "module";
+                    config.ecmaVersion = Number(version);
+                    config.sourceType = "module";
+                    if (filename.includes("comment")) {
+                        config.comment = true;
+                    }
 
-                // set sourceType of program node to module
-                if (expected.type === "Program") {
-                    expected.sourceType = "module";
-                }
+                    // set sourceType of program node to module
+                    if (expected.type === "Program") {
+                        expected.sourceType = "module";
+                    }
 
-                tester.assertMatches(code, config, expected);
+                    tester.assertMatches(code, config, expected);
+                });
             });
 
         });
     });
+
 
     describe("general", () => {
         it("Should parse using 2015 instead of 6", () => {
@@ -110,7 +137,7 @@ describe("ecmaVersion", () => {
                 loc: true
             });
 
-            assert.deepStrictEqual(tester.getRaw(ast), require("../fixtures/parse/all-pieces.json"));
+            assert.deepStrictEqual(tester.getRaw(ast), allPiecesJson);
         });
 
         it("Should throw error using invalid number", () => {
@@ -124,7 +151,7 @@ describe("ecmaVersion", () => {
                         loc: true
                     }
                 );
-            }, /Invalid ecmaVersion/);
+            }, /Invalid ecmaVersion/u);
         });
 
         it("Should throw error using invalid year", () => {
@@ -138,7 +165,7 @@ describe("ecmaVersion", () => {
                         loc: true
                     }
                 );
-            }, /Invalid ecmaVersion/);
+            }, /Invalid ecmaVersion/u);
         });
 
         it("Should throw error when non-numeric year is provided", () => {
@@ -152,7 +179,93 @@ describe("ecmaVersion", () => {
                         loc: true
                     }
                 );
-            }, /ecmaVersion must be a number. Received value of type string instead/);
+            }, /ecmaVersion must be a number or "latest". Received value of type string instead/u);
+        });
+
+        it("Should throw error when using ES3 and reserved words", () => {
+            assert.throws(() => {
+                espree.parse(
+                    "var char = 'c'", {
+                        ecmaVersion: 3
+                    }
+                );
+            }, /'char' is reserved/u);
+        });
+
+        it("Should throw error when using ES3 and reserved words in object literals", () => {
+            assert.throws(() => {
+                espree.parse(
+                    "var x = { char: 'c' }", {
+                        ecmaVersion: 3
+                    }
+                );
+            }, /'char' is reserved/u);
+        });
+
+        it("Should throw error when using ES3, allowReserved: false, and reserved words", () => {
+            assert.throws(() => {
+                espree.parse(
+                    "var char = 'c'", {
+                        ecmaVersion: 3,
+                        allowReserved: false
+                    }
+                );
+            }, /'char' is reserved/u);
+        });
+
+        it("Should not throw error when using ES3, allowReserved: true, and reserved words", () => {
+            assert.doesNotThrow(() => {
+                espree.parse(
+                    "var char = 'c'", {
+                        ecmaVersion: 3,
+                        allowReserved: true
+                    }
+                );
+            });
+        });
+
+        it("Should not throw error when using ES3, allowReserved: true, and reserved words in object literals", () => {
+            assert.doesNotThrow(() => {
+                espree.parse(
+                    "var x = { char: 'c' }", {
+                        ecmaVersion: 3,
+                        allowReserved: true
+                    }
+                );
+            });
+        });
+
+        it("Should throw error when using ES5, allowReserved: true", () => {
+            assert.throws(() => {
+                espree.parse(
+                    "var x = { char: 'c' }", {
+                        ecmaVersion: 5,
+                        allowReserved: true
+                    }
+                );
+            }, /`allowReserved` is only supported when ecmaVersion is 3/u);
+        });
+
+        it("Should throw error when using ES3, allowReserved: non-boolean", () => {
+            assert.throws(() => {
+                espree.parse(
+                    "var x = { char: 'c' }", {
+                        ecmaVersion: 3,
+                        allowReserved: "true"
+                    }
+                );
+            }, /`allowReserved`, when present, must be `true` or `false`/u);
+        });
+
+        it("Should not throw error when using ES5, allowReserved: false, and ES3 reserved words in object literals", () => {
+            assert.doesNotThrow(() => {
+                espree.parse(
+                    "var x = { char: 'c' }", {
+                        ecmaVersion: 5,
+                        allowReserved: false
+                    }
+                );
+            });
         });
 
         it("Should throw error when using module in pre-ES6", () => {
@@ -163,7 +276,36 @@ describe("ecmaVersion", () => {
                         sourceType: "module"
                     }
                 );
-            }, /sourceType 'module' is not supported when ecmaVersion < 2015/);
+            }, /sourceType 'module' is not supported when ecmaVersion < 2015/u);
+        });
+
+        it("Should allow 'latest' as value", () => {
+            const expected = espree.parse(
+                "let foo = bar;", {
+                    ecmaVersion: espree.latestEcmaVersion,
+                    sourceType: "module"
+                }
+            );
+
+            const actual = espree.parse(
+                "let foo = bar;", {
+                    ecmaVersion: "latest",
+                    sourceType: "module"
+                }
+            );
+
+            assert.deepStrictEqual(actual, expected);
+        });
+
+        it("Should use the 5 as the default for ecmaVersion", () => {
+
+            assert.throws(() => {
+                espree.parse(
+                    "let foo = bar;"
+                );
+
+            }, /Unexpected token foo/u);
+
         });
     });
 

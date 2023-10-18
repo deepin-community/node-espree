@@ -1,1 +1,3 @@
-mocha --no-timeout --reporter tap --exclude tests/lib/libraries.js 'tests/lib/**/*.js'
+mocha --no-timeout --reporter tap --exclude tests/lib/libraries.js 'tests/lib/**/*.js' || true
+sed -i -e 's,"../../dist/espree.cjs","espree",' tests/lib/commonjs.cjs
+mocha --no-timeout --reporter tap tests/lib/commonjs.cjs

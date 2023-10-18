@@ -1,1 +1,12 @@
-.pc/
+build
+coverage
+node_modules
+.DS_Store
+dist
+npm-debug.log
+_test.js
+.idea
+.nyc_output
+.eslint-release-info.json
+yarn.lock
+package-lock.json

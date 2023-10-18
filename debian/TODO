@@ -1,2 +1,3 @@
   * check full testsuite during build (don't skip libraries test)
-  * lint-check code strictly
+  * improve autopkgtest to cover EcmaScript module
+    when understood why it fails to load system-shared modules

@@ -7,22 +7,22 @@ Section: javascript
 Testsuite: autopkgtest-pkg-nodejs
 Priority: optional
 Build-Depends:
+ cmark-gfm <!nodoc>,
  debhelper-compat (= 13),
  dh-sequence-nodejs,
  chai <!nocheck>,
  eslint <!nocheck>,
- libipc-system-simple-perl,
- libpath-tiny-perl,
  mocha <!nocheck>,
- node-acorn (>= 8.5) <!nocheck>,
+ node-acorn (>= 8.7.0) <!nocheck>,
  node-eslint-config-eslint <!nocheck>,
  node-eslint-plugin-node <!nocheck>,
- node-eslint-visitor-keys <!nocheck>,
- node-leche <!nocheck>,
+ node-eslint-visitor-keys (>= 3.3.0) <!nocheck>,
+ node-rollup-plugin-commonjs,
+ node-rollup-plugin-json,
+ node-rollup-plugin-node-resolve,
  node-shelljs <!nocheck>,
- node-unicode-14.0.0,
- perl,
-Standards-Version: 4.6.0
+ rollup,
+Standards-Version: 4.6.2
 Vcs-Browser: https://salsa.debian.org/js-team/node-espree
 Vcs-Git: https://salsa.debian.org/js-team/node-espree.git
 Homepage: https://github.com/eslint/espree
@@ -31,8 +31,8 @@ Rules-Requires-Root: no
 Package: node-espree
 Architecture: all
 Depends:
- node-acorn (>= 6),
- node-eslint-visitor-keys,
+ node-acorn (>= 8.7.0),
+ node-eslint-visitor-keys (>= 3.3.0),
  ${misc:Depends},
 Description: Esprima-compatible JavaScript parser built on Acorn
  Espree started out as a fork of Esprima v1.2.2,

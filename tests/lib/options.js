@@ -3,14 +3,13 @@
  * @author Aniketh Saha
  */
 
-"use strict";
-
 //------------------------------------------------------------------------------
 // Requirements
 //------------------------------------------------------------------------------
 
-const assert = require("assert"),
-    { normalizeOptions } = require("../../lib/options");
+import assert from "assert";
+import { normalizeOptions, getLatestEcmaVersion } from "../../lib/options.js";
+
 
 //------------------------------------------------------------------------------
 // Tests
@@ -23,6 +22,14 @@ describe("normalizeOptions", () => {
         const output = normalizeOptions(option);
 
         assert.strictEqual(output.ecmaVersion, 5);
+    });
+
+    it("should set ecmaVersion to latestEcmaVersion if ecmaVersion: latest is passed", () => {
+        const output = normalizeOptions({
+            ecmaVersion: "latest"
+        });
+
+        assert.strictEqual(output.ecmaVersion, getLatestEcmaVersion());
     });
 
     it("should throw error for sourceType module and ecmaVersion < 6", () => {

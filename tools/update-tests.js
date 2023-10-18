@@ -2,87 +2,89 @@
  * @fileoverview A simple script to update existing tests to reflect new
  *      parser changes.
  * @author Nicholas C. Zakas
-
-"use strict";
-
-/*
+ *
  * Usage:
  *      node tools/update-tests.js
  *
  */
 
 //------------------------------------------------------------------------------
-// Requirements
+// Imports
 //------------------------------------------------------------------------------
 
-var shelljs = require("shelljs"),
-    espree = require("../espree"),
-    tester = require("../tests/lib/tester"),
-    path = require("path");
+import shelljs from "shelljs";
+import tester from "../tests/lib/tester.js";
+import path from "path";
+import { fileURLToPath } from "url";
 
 //------------------------------------------------------------------------------
 // Helpers
 //------------------------------------------------------------------------------
 
-function getExpectedResult(code, config) {
-    try {
-        return tester.getRaw(espree.parse(code, config));
-    } catch (ex) {
-        var raw = tester.getRaw(ex);
-        raw.message = ex.message;
-        return raw;
-    }
-}
+// eslint-disable-next-line no-underscore-dangle -- Conventional
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/**
+ * Gets test file names
+ * @param {string} directory The directory
+ * @returns {string[]} The file names
+ */
 function getTestFilenames(directory) {
-    return shelljs.find(directory).filter(function(filename) {
-        return filename.indexOf(".src.js") > -1;
-    }).map(function(filename) {
-        return filename.substring(directory.length - 1, filename.length - 7);  // strip off ".src.js"
-    });
+    return shelljs.find(directory).filter(filename =>
+        filename.indexOf(".src.js") > -1).map(filename =>
+        filename.slice(directory.length - 1, filename.length - 7)); // strip off ".src.js"
 }
 
+/**
+ * Gets library file names
+ * @param {string} directory The directory
+ * @returns {string[]} The file names
+ */
 function getLibraryFilenames(directory) {
-    return shelljs.find(directory).filter(function(filename) {
-        return filename.indexOf(".js") > -1 && filename.indexOf(".result.js") === -1;
-    }).map(function(filename) {
-        return filename.substring(directory.length - 1);  // strip off directory
-    });
+    return shelljs.find(directory).filter(filename =>
+        filename.indexOf(".js") > -1 &&
+            filename.indexOf(".result.js") === -1).map(filename =>
+        filename.slice(directory.length - 1)); // strip off directory
 }
 
+/**
+ * Outputs the result.
+ * @param {any} result The result
+ * @param {string} testResultFilename Test result file name
+ * @returns {void}
+ */
 function outputResult(result, testResultFilename) {
-    ("module.exports = " + JSON.stringify(result, null, "    ") + ";").to(testResultFilename);
+    `export default ${tester.getAstCode(result)};`.to(testResultFilename);
 }
 
 //------------------------------------------------------------------------------
 // Setup
 //------------------------------------------------------------------------------
 
-var FIXTURES_DIR = "./tests/fixtures/ecma-features",
-    FIXTURES_VERSION_DIR = "./tests/fixtures/ecma-version",
+const FIXTURES_DIR = "./tests/fixtures/ecma-features",
     LIBRARIES_DIR = "./tests/fixtures/libraries";
 
-var testFiles = getTestFilenames(FIXTURES_DIR),
-    versionFiles = getTestFilenames(FIXTURES_VERSION_DIR),
+const testFiles = getTestFilenames(FIXTURES_DIR),
     libraryFiles = getLibraryFilenames(LIBRARIES_DIR);
 
-libraryFiles.forEach(function(filename) {
-    var testResultFilename = path.resolve(__dirname, "..", LIBRARIES_DIR, filename) + ".result.json",
-        code = shelljs.cat(path.resolve(LIBRARIES_DIR, filename)),
-        result = getExpectedResult(code, {
-            loc: true,
-            range: true,
-            tokens: true
-        });
+libraryFiles.forEach(filename => {
+    const testResultFilename = `${path.resolve(__dirname, "..", LIBRARIES_DIR, filename)}.result.json`,
+        code = shelljs.cat(path.resolve(LIBRARIES_DIR, filename));
+    let result = tester.getExpectedResult(code, {
+        loc: true,
+        range: true,
+        tokens: true
+    });
+
     JSON.stringify(result).to(testResultFilename);
     result = null;
 });
 
 // update all tests in ecma-features
-testFiles.forEach(function(filename) {
+testFiles.forEach(filename => {
 
-    var feature = path.dirname(filename),
-        code = shelljs.cat(path.resolve(FIXTURES_DIR, filename) + ".src.js"),
+    const feature = path.dirname(filename),
+        code = shelljs.cat(`${path.resolve(FIXTURES_DIR, filename)}.src.js`),
         config = {
             loc: true,
             range: true,
@@ -92,25 +94,8 @@ testFiles.forEach(function(filename) {
         };
 
     config.ecmaFeatures[feature] = true;
-    var testResultFilename = path.resolve(__dirname, "..", FIXTURES_DIR, filename) + ".result.js";
-    var result = getExpectedResult(code, config);
-
-    outputResult(result, testResultFilename);
-});
-
-versionFiles.forEach(function(filename) {
-
-    var version = Number(filename.substring(0, filename.indexOf("/"))),
-        code = shelljs.cat(path.resolve(FIXTURES_VERSION_DIR, filename) + ".src.js"),
-        config = {
-            loc: true,
-            range: true,
-            tokens: true,
-            ecmaVersion: version
-        };
-
-    var testResultFilename = path.resolve(__dirname, "..", FIXTURES_VERSION_DIR, filename) + ".result.js",
-        result = getExpectedResult(code, config);
+    const testResultFilename = `${path.resolve(__dirname, "..", FIXTURES_DIR, filename)}.result.js`;
+    const result = tester.getExpectedResult(code, config);
 
     outputResult(result, testResultFilename);
 });

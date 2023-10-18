@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: espree
-Upstream-Contact: https://github.com/eslint/espree.git
+Upstream-Contact: https://github.com/eslint/espree/issues
 Source: https://github.com/eslint/espree
  .
  Repackaged, excluding source-less code.
@@ -9,13 +9,25 @@ Files-Excluded:
 
 Files: *
 Copyright:
-  2011-2013  Ariya Hidayat <ariya.hidayat@gmail.com>
-             JS Foundation and other contributors, https://js.foundation
-  2017       Nicholas C. Zakas <nicholas+npm@nczconsulting.com>
-             Open JS Foundation
-  2012       Yusuke Suzuki <utatane.tea@gmail.com>
+        JS Foundation and other contributors, https://js.foundation
+  2017  Nicholas C. Zakas <nicholas+npm@nczconsulting.com>
+        Open JS Foundation
 License: BSD-2-Clause
 Reference: package.json
+
+Files:
+ tests/fixtures/ecma-version/13/class-static-blocks/*
+Copyright: 2021, the V8 project authors
+ 2012-2013 Ecma International
+License-Grant:
+ This code is governed by the BSD license
+ found in the <LICENSE> file.
+License: BSD-3-Clause~Ecma
+Comment:
+ Referenced file <LICENSE> is assumed to *not* be
+ the one at the root of this project,
+ but instead the one at the root of the test262 project.
+ See also <https://github.com/eslint/espree/issues/537>.
 
 Files:
  espree.js
@@ -33,15 +45,9 @@ Comment:
   - Acorn, Babylon and Babel-ESLint, which are Expat licensed
 
 Files:
- lib/visitor-keys.js
-Copyright:
-  2014  Ingvar Stepanyan
-License: Expat
-
-Files:
  debian/*
 Copyright:
-  2020-2021  Jonas Smedegaard <dr@jones.dk>
+  2020-2022  Jonas Smedegaard <dr@jones.dk>
   2017       Pirate Praveen <praveen@debian.org>
   2020       Yadd <yadd@debian.org>
 License: GPL-3+
@@ -69,6 +75,45 @@ License: BSD-2-Clause
  AND FITNESS FOR A PARTICULAR PURPOSE
  ARE DISCLAIMED.
  IN NO EVENT SHALL THE HOLDERS OR CONTRIBUTORS BE LIABLE
+ FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ OR CONSEQUENTIAL DAMAGES
+ (INCLUDING, BUT NOT LIMITED TO,
+ PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ LOSS OF USE, DATA, OR PROFITS;
+ OR BUSINESS INTERRUPTION)
+ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+License: BSD-3-Clause~Ecma
+ Redistribution and use in source and binary forms,
+ with or without modification,
+ are permitted
+ provided that the following conditions are met:
+ .
+   * Redistributions of source code must retain
+     the above copyright notice, this list of conditions
+     and the following disclaimer.
+   * Redistributions in binary form must reproduce
+     the above copyright notice, this list of conditions
+     and the following disclaimer
+     in the documentation and/or other materials
+     provided with the distribution.
+   * Neither the name of the author.
+     nor Ecma International
+     may be used to endorse or promote
+     products derived from this software
+     without specific prior written permission.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE ECMA INTERNATIONAL "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ INCLUDING, BUT NOT LIMITED TO,
+ THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED.
+ IN NO EVENT SHALL ECMA INTERNATIONAL BE LIABLE
  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
  OR CONSEQUENTIAL DAMAGES
  (INCLUDING, BUT NOT LIMITED TO,

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     "type": "Program",
     "loc": {
         "start": {
@@ -6,8 +6,8 @@ module.exports = {
             "column": 0
         },
         "end": {
-            "line": 1,
-            "column": 11
+            "line": 2,
+            "column": 1
         }
     },
     "range": [
@@ -23,8 +23,8 @@ module.exports = {
                     "column": 0
                 },
                 "end": {
-                    "line": 1,
-                    "column": 11
+                    "line": 2,
+                    "column": 1
                 }
             },
             "range": [
@@ -40,8 +40,8 @@ module.exports = {
                             "column": 4
                         },
                         "end": {
-                            "line": 1,
-                            "column": 11
+                            "line": 2,
+                            "column": 1
                         }
                     },
                     "range": [
@@ -74,8 +74,8 @@ module.exports = {
                                 "column": 8
                             },
                             "end": {
-                                "line": 1,
-                                "column": 11
+                                "line": 2,
+                                "column": 1
                             }
                         },
                         "range": [
@@ -155,8 +155,8 @@ module.exports = {
                     "column": 8
                 },
                 "end": {
-                    "line": 1,
-                    "column": 11
+                    "line": 2,
+                    "column": 1
                 }
             },
             "range": [
