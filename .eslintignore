@@ -1,4 +1,4 @@
-!.eslintrc.js
 /node_modules
 /tests/fixtures
-/tools
+/dist
+tools/create-test-example.js

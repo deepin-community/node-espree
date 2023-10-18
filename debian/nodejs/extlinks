@@ -1,0 +1,7 @@
+acorn test
+acorn-jsx test
+eslint-visitor-keys test
+@rollup/plugin-commonjs
+@rollup/plugin-json
+@rollup/plugin-node-resolve
+shelljs test

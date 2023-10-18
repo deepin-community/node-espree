@@ -1,5 +1,12 @@
 #!/usr/bin/make -f
 
+# generate documentation unless nodoc requested
+ifeq (,$(filter nodoc,$(DEB_BUILD_OPTIONS)))
+DOCS = README.html README.txt
+CHANGELOGS = CHANGELOG.html CHANGELOG.txt
+endif
+
+export NO_COLOR=1
 ESLINT = eslint
 MOCHA = mocha --no-timeout
 # normalize output with TAP where possible unless terse requested
@@ -11,18 +18,32 @@ ESLINT += --format unix
 MOCHA += --reporter dot --no-colors
 endif
 
-%:
-	dh $@
+override_dh_clean:
+	dh_clean -- $(DOCS) $(CHANGELOGS)
 
-override_dh_auto_configure:
-	[ -e tools/generate-test-fixture.js.orig ] || cp tools/generate-test-fixture.js tools/generate-test-fixture.js.orig
-	perl debian/update-unicode-patterns.pl
+override_dh_auto_build:
+	rollup -c
+
+execute_after_dh_auto_build: $(DOCS) $(CHANGELOGS)
 
 # TODO: check full testsuite
 # TODO: lint-check code strictly
 override_dh_auto_test:
-	$(MOCHA) --exclude tests/lib/libraries.js 'tests/lib/**/*.js'
-	$(ESLINT) Makefile.js .eslintrc.js 'lib/**/*.js' espree.js 'tests/lib/**/*.js' || true
+	$(MOCHA) --ignore tests/lib/libraries.js 'tests/lib/**/*.js'
+	$(MOCHA) tests/lib/commonjs.cjs
+	$(ESLINT) --no-eslintrc --env es2020 --parser-options sourceType:module '*.?(c)js' lib/ tests/lib/ || true
 
-override_dh_auto_clean:
-	[ ! -e tools/generate-test-fixture.js.orig ] || mv -f tools/generate-test-fixture.js.orig tools/generate-test-fixture.js
+override_dh_installdocs:
+	dh_installdocs --all -- $(DOCS)
+
+override_dh_installchangelogs:
+	dh_installchangelogs -- $(CHANGELOGS)
+
+%.html: %.md
+	cmark-gfm $< > $@
+
+%.txt: %.md
+	cmark-gfm --to plaintext $< > $@
+
+%:
+	dh $@
